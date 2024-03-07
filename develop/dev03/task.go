@@ -64,7 +64,7 @@ type config struct {
 
 func (c *config) parseFlags() {
 	var column int
-	flag.IntVar(&column, "k", 0, "column to sort")
+	flag.IntVar(&column, "k", 1, "column to sort")
 
 	var number bool
 	flag.BoolVar(&number, "n", false, "number sort")
@@ -85,6 +85,17 @@ func (c *config) parseFlags() {
 	flag.StringVar(&file, "f", "", "file")
 
 	flag.Parse()
+
+	// проверим взаимоисключающие флаги
+	if number && month {
+		fmt.Println("Error: -n and -M flags cannot be used together")
+		os.Exit(1)
+	}
+
+	if column <= 0 {
+		fmt.Println("Error: invalid flag -k must be > 0")
+		os.Exit(1)
+	}
 
 	c.column = column - 1
 	c.number = number
@@ -140,18 +151,6 @@ func (c *config) parseFlags() {
 func main() {
 	cfg := config{}
 	cfg.parseFlags()
-
-	// проверим взаимоисключающие флаги
-	if cfg.number && cfg.month {
-		fmt.Println("Error: -n and -M flags cannot be used together")
-		os.Exit(1)
-	}
-
-	if cfg.column <= 0 {
-		fmt.Println("Error: invalid flag -k must be > 0")
-		os.Exit(1)
-	}
-
 	input := getInputData(cfg.file)
 	result := sortInput(input, cfg)
 	fmt.Println(result)
