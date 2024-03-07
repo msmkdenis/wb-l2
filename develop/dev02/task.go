@@ -44,13 +44,16 @@ func UnpackEscape(str string) string {
 		return ""
 	}
 
+	// Переводим в руны
 	s := []rune(str)
 	out := &strings.Builder{}
 
+	// Строка не может начинаться с цифры
 	if unicode.IsDigit(s[0]) {
 		return ""
 	}
 
+	// Флаг экранирования
 	var escape bool
 	for i := 0; i < len(s); i++ {
 		if s[i] == '\\' {

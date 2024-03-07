@@ -1,0 +1,12 @@
+a b c d e 3 jan
+b c d e f 2 c
+c d e f g 1 mar
+d e f g h a apr
+e f g h k v a
+f g h k l c june
+g h k l m 6 july
+g h k l m 6 b
+o p r s t 6 2
+v b s e u 6 1
+g h k l m 6 nov
+g s f g h 6 dec
