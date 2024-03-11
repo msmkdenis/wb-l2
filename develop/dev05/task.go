@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -88,6 +89,7 @@ func main() {
 
 	input := getInputData(str[1])
 
+	fmt.Println(cfg)
 	customGrep(cfg, str[0], input)
 }
 
@@ -100,11 +102,106 @@ func customGrep(cfg config, str string, input []string) {
 		pattern = regexp.MustCompile(str)
 	}
 
+	answer := &strings.Builder{}
 	for i, v := range input {
-		if pattern.Match([]byte(v)) {
-			fmt.Println(i+1, v)
+		if cfg.ignoreCase {
+			if cfg.invert {
+				if !cfg.fixed && !pattern.Match([]byte(strings.ToLower(v))) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+				if cfg.fixed && strings.ToLower(str) != strings.ToLower(v) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+			} else {
+				if !cfg.fixed && pattern.Match([]byte(strings.ToLower(v))) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+				if cfg.fixed && strings.ToLower(str) == strings.ToLower(v) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+			}
+		} else {
+			if cfg.invert {
+				if !cfg.fixed && !pattern.Match([]byte(v)) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+				if cfg.fixed && str != v {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+			} else {
+				if !cfg.fixed && pattern.Match([]byte(v)) {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+				if cfg.fixed && str != v {
+					writeAnswer(answer, cfg, i, v, input)
+				}
+			}
 		}
 	}
+	fmt.Println(answer.String())
+}
+
+var dict = make(map[string]struct{})
+
+func writeAnswer(answer *strings.Builder, cfg config, i int, v string, input []string) {
+
+	if cfg.before >= i+1 {
+		for j := 0; j < i; j++ {
+			s := fmt.Sprintf(getFormat(j, len(input)), getLineNum(j, cfg.lineNum), input[j])
+			if _, ok := dict[s]; !ok {
+				dict[s] = struct{}{}
+				answer.WriteString(s)
+			}
+		}
+	} else {
+		for j := i - cfg.before; j < i; j++ {
+			s := fmt.Sprintf(getFormat(j, len(input)), getLineNum(j, cfg.lineNum), input[j])
+			if _, ok := dict[s]; !ok {
+				dict[s] = struct{}{}
+				answer.WriteString(s)
+			}
+		}
+	}
+
+	s := fmt.Sprintf(getFormat(i, len(input)), getLineNum(i, cfg.lineNum), v)
+	if _, ok := dict[s]; !ok {
+		dict[s] = struct{}{}
+		answer.WriteString(s)
+	}
+
+	//answer.WriteString(fmt.Sprintf(getFormat(i, len(input)), getLineNum(i, cfg.lineNum), v))
+
+	if cfg.after >= len(input)-i-1 {
+		for j := i + 1; j < len(input); j++ {
+			s := fmt.Sprintf(getFormat(j, len(input)), getLineNum(j, cfg.lineNum), input[j])
+			if _, ok := dict[s]; !ok {
+				dict[s] = struct{}{}
+				answer.WriteString(s)
+			}
+		}
+	} else {
+		for j := i + 1; j < i+1+cfg.after; j++ {
+			s := fmt.Sprintf(getFormat(j, len(input)), getLineNum(j, cfg.lineNum), input[j])
+			if _, ok := dict[s]; !ok {
+				dict[s] = struct{}{}
+				answer.WriteString(s)
+			}
+		}
+	}
+}
+
+func getLineNum(i int, isLineNum bool) string {
+	if isLineNum {
+		return strconv.Itoa(i+1) + " "
+	}
+	return ""
+}
+
+func getFormat(i, len int) string {
+	if i == len-1 {
+		return "%s%s"
+	}
+	return "%s%s\n"
 }
 
 func getInputData(file string) []string {
