@@ -33,7 +33,7 @@ type config struct {
 	after      int
 	before     int
 	context    int
-	count      int
+	count      bool
 	ignoreCase bool
 	invert     bool
 	fixed      bool
@@ -50,8 +50,8 @@ func (c *config) parseFlags() {
 	var context int
 	flag.IntVar(&context, "C", 0, "(A+B) печатать ±N строк вокруг совпадения")
 
-	var count int
-	flag.IntVar(&count, "c", 0, "количество строк")
+	var count bool
+	flag.BoolVar(&count, "c", false, "количество строк")
 
 	var ignoreCase bool
 	flag.BoolVar(&ignoreCase, "i", false, "игнорировать регистр")
@@ -67,9 +67,20 @@ func (c *config) parseFlags() {
 
 	flag.Parse()
 
-	c.after = after
-	c.before = before
-	c.context = c.after + c.before
+	if after > 0 && before > 0 && context > 0 {
+		slog.Error("too many arguments, choose after & before or context only")
+		os.Exit(1)
+	}
+
+	if context > 0 {
+		c.after = context
+		c.before = context
+	} else {
+		c.after = after
+		c.before = before
+	}
+
+	c.context = context
 	c.count = count
 	c.ignoreCase = ignoreCase
 	c.invert = invert
@@ -83,17 +94,21 @@ func main() {
 
 	str := flag.Args()
 	if len(str) < 2 {
-		slog.Error("not enough arguments")
+		slog.Error("not enough arguments, need pattern and file")
 		os.Exit(1)
 	}
 
 	input := getInputData(str[1])
 
-	fmt.Println(cfg)
-	customGrep(cfg, str[0], input)
+	res := customGrep(cfg, str[0], input)
+	if cfg.count {
+		fmt.Println(len(strings.Split(res, "\n")))
+	} else {
+		fmt.Println(res)
+	}
 }
 
-func customGrep(cfg config, str string, input []string) {
+func customGrep(cfg config, str string, input []string) string {
 
 	var pattern *regexp.Regexp
 	if cfg.ignoreCase {
@@ -138,7 +153,7 @@ func customGrep(cfg config, str string, input []string) {
 			}
 		}
 	}
-	fmt.Println(answer.String())
+	return answer.String()
 }
 
 var dict = make(map[string]struct{})
@@ -168,8 +183,6 @@ func writeAnswer(answer *strings.Builder, cfg config, i int, v string, input []s
 		dict[s] = struct{}{}
 		answer.WriteString(s)
 	}
-
-	//answer.WriteString(fmt.Sprintf(getFormat(i, len(input)), getLineNum(i, cfg.lineNum), v))
 
 	if cfg.after >= len(input)-i-1 {
 		for j := i + 1; j < len(input); j++ {
