@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "25b78f13-233f-4129-b9dc-4568642eac2a",
+		"name": "Calendar",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21643786"
+	},
+	"item": [
+		{
+			"name": "CreateEvent_1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"1\",\r\n    \"creator_id\": \"1\",\r\n    \"name\": \"Rolling Stones Tourne\",\r\n    \"description\": \"licks world tour\",\r\n    \"date\": \"2019-11-11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateEvent_2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"2\",\r\n    \"creator_id\": \"1\",\r\n    \"name\": \"Rolling Stones Tourne\",\r\n    \"description\": \"licks world tour\",\r\n    \"date\": \"2019-11-11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateEvent_3",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"3\",\r\n    \"creator_id\": \"1\",\r\n    \"name\": \"Rolling Stones Tourne\",\r\n    \"description\": \"licks world tour\",\r\n    \"date\": \"2019-12-11\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateEvent_4",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"4\",\r\n    \"creator_id\": \"1\",\r\n    \"name\": \"Rolling Stones Tourne\",\r\n    \"description\": \"licks world tour\",\r\n    \"date\": \"2019-11-12\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateEvent Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"1\",\r\n    \"creator_id\": \"1\",\r\n    \"name\": \"Rolling Stones Tourne\",\r\n    \"description\": \"licks world tour\",\r\n    \"date\": \"2020-09-09\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/update_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"update_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEventsForDay",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/get_events_for_day?user_id=1&date=2019-11-11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"get_events_for_day"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "1"
+						},
+						{
+							"key": "date",
+							"value": "2019-11-11"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEventsForMonth",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/get_events_for_month?user_id=1&date=2019-11-11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"get_events_for_month"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "1"
+						},
+						{
+							"key": "date",
+							"value": "2019-11-11"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEventsForYear",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/get_events_for_year?user_id=1&date=2020-11-11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"get_events_for_year"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "1"
+						},
+						{
+							"key": "date",
+							"value": "2020-11-11"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteEvent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"1\",\r\n    \"creator_id\": \"1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/delete_event",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"delete_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetEventsForYear(EmptyAfterDelete)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/get_events_for_year?user_id=1&date=2020-11-11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"get_events_for_year"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "1"
+						},
+						{
+							"key": "date",
+							"value": "2020-11-11"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
