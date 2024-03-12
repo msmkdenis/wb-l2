@@ -10,6 +10,7 @@ import (
 type CalendarRepository interface {
 	Insert(ctx context.Context, e *model.Event) (*model.Event, error)
 	Update(ctx context.Context, e *model.Event) (*model.Event, error)
+	Delete(ctx context.Context, id, creatorID uint64) error
 	SelectForDay(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
 	SelectForMonth(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
 	SelectForYear(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
@@ -43,4 +44,8 @@ func (c *Calendar) GetEventsForMonth(ctx context.Context, creatorId uint64, date
 
 func (c *Calendar) GetEventsForYear(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error) {
 	return c.repository.SelectForYear(ctx, creatorId, date)
+}
+
+func (c *Calendar) Delete(ctx context.Context, id, creatorID uint64) error {
+	return c.repository.Delete(ctx, id, creatorID)
 }

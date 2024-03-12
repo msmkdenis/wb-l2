@@ -38,11 +38,28 @@ func (c *Calendar) Update(ctx context.Context, e *model.Event) (*model.Event, er
 	}
 
 	if e.CreatorID != event.CreatorID {
-		return nil, calendarerr.ErrEventUpdateNotAllowed
+		return nil, calendarerr.ErrEventOperationNotAllowed
 	}
 
 	c.storage[e.ID] = *e
 	return e, nil
+}
+
+func (c *Calendar) Delete(ctx context.Context, id, creatorID uint64) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	event, ok := c.storage[id]
+	if !ok {
+		return calendarerr.ErrEventNotFound
+	}
+
+	if event.CreatorID != creatorID {
+		return calendarerr.ErrEventOperationNotAllowed
+	}
+
+	delete(c.storage, id)
+	return nil
 }
 
 func (c *Calendar) SelectForDay(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error) {

@@ -21,6 +21,7 @@ import (
 type CalendarService interface {
 	Add(ctx context.Context, e *model.Event) (*model.Event, error)
 	Update(ctx context.Context, e *model.Event) (*model.Event, error)
+	Delete(ctx context.Context, id, creatorID uint64) error
 	GetEventsForDay(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
 	GetEventsForMonth(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
 	GetEventsForYear(ctx context.Context, creatorId uint64, date time.Time) ([]model.Event, error)
@@ -40,12 +41,72 @@ func NewCalendar(s CalendarService, mux *http.ServeMux, requestLogger *middlewar
 
 	c.mux.Handle("/create_event", requestLogger.Logger(http.HandlerFunc(c.CreateEvent)))
 	c.mux.Handle("/update_event", requestLogger.Logger(http.HandlerFunc(c.UpdateEvent)))
+	c.mux.Handle("/delete_event", requestLogger.Logger(http.HandlerFunc(c.DeleteEvent)))
 	c.mux.Handle("/get_events_for_day", requestLogger.Logger(http.HandlerFunc(c.GetEventsForDay)))
-	c.mux.Handle("/get_events_for_month", requestLogger.Logger(http.HandlerFunc(c.GetEventsForDay)))
-	c.mux.Handle("/get_events_for_year", requestLogger.Logger(http.HandlerFunc(c.GetEventsForDay)))
+	c.mux.Handle("/get_events_for_month", requestLogger.Logger(http.HandlerFunc(c.GetEventsForMonth)))
+	c.mux.Handle("/get_events_for_year", requestLogger.Logger(http.HandlerFunc(c.GetEventsForYear)))
 
 	return c
 }
+
+func (h *Calendar) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		slog.Info("method not allowed", "caller", pkg.Caller())
+		h.writeErrorResponse(errors.New("method not allowed"), w, http.StatusBadRequest)
+		return
+	}
+
+	if r.Header.Get("Content-Type") != "application/json" {
+		slog.Info("invalid content type", "caller", pkg.Caller())
+		h.writeErrorResponse(errors.New("invalid content type"), w, http.StatusBadRequest)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		slog.Info("unable to read request", "caller", pkg.Caller())
+		h.writeErrorResponse(err, w, http.StatusInternalServerError)
+		return
+	}
+
+	var request dto.EventCreateRequest
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		slog.Info("unable to unmarshal request", "caller", pkg.Caller())
+		h.writeErrorResponse(err, w, http.StatusBadRequest)
+		return
+	}
+
+	eventId, err := strconv.ParseUint(request.ID, 10, 64)
+	if err != nil || eventId == 0 {
+		slog.Info("invalid event id", "caller", pkg.Caller())
+		h.writeErrorResponse(errors.New("invalid event id"), w, http.StatusBadRequest)
+		return
+	}
+
+	creatorId, err := strconv.ParseUint(request.CreatorID, 10, 64)
+	if err != nil || creatorId == 0 {
+		slog.Info("invalid creator id", "caller", pkg.Caller())
+		h.writeErrorResponse(errors.New("invalid creator id"), w, http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.Delete(r.Context(), eventId, creatorId)
+	if err != nil {
+		if errors.Is(err, calendarerr.ErrEventNotFound) || errors.Is(err, calendarerr.ErrEventOperationNotAllowed) {
+			slog.Info("event not found", "caller", pkg.Caller())
+			h.writeErrorResponse(err, w, http.StatusServiceUnavailable)
+			return
+		}
+		slog.Info("unable to add event", "caller", pkg.Caller())
+		h.writeErrorResponse(err, w, http.StatusInternalServerError)
+		return
+	}
+
+	h.writeResultResponse("event deleted", w)
+}
+
 func (h *Calendar) GetEventsForMonth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		slog.Info("method not allowed", "caller", pkg.Caller())
@@ -226,7 +287,7 @@ func (h *Calendar) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 
 	event, err := h.service.Update(r.Context(), eventToUpdate)
 	if err != nil {
-		if errors.Is(err, calendarerr.ErrEventNotFound) || errors.Is(err, calendarerr.ErrEventUpdateNotAllowed) {
+		if errors.Is(err, calendarerr.ErrEventNotFound) || errors.Is(err, calendarerr.ErrEventOperationNotAllowed) {
 			slog.Info("event not found", "caller", pkg.Caller())
 			h.writeErrorResponse(err, w, http.StatusServiceUnavailable)
 			return

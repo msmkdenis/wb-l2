@@ -1,10 +1,11 @@
 package main
 
 import (
-	"dev11/internal/app/calendar"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"dev11/internal/app/calendar"
 )
 
 func main() {
