@@ -23,5 +23,5 @@ package main
 */
 
 func main() {
-
+	// запуск сервера через файл cmd/calendar/main.go
 }

@@ -38,7 +38,7 @@ func main() {
 	}
 
 	if err := wget(*uri); err != nil {
-		log.Fatalf("[Error] %v\n", err)
+		log.Fatalf("wget error: %s", err)
 	}
 
 }
